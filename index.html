@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Fuel Dashboard</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <!-- jsPDF & XLSX (for exports) -->
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+  </head>
+  <body>
+    <header class="header">
+      <div class="left">
+        <!-- Dashboard shell (hidden until login) -->
+        <div id="dashboard-shell" class="hidden">
+          <div
+            id="back-btn"
+            style="font-size: 30px; display: none"
+            class="ghost ml"
+          >
+            <span>&#8592;</span>
+          </div>
+        </div>
+        <h1 id="app-title">Fuel Dashboard</h1>
+      </div>
+      <div class="right">
+        <span id="user-role-badge" class="badge">GUEST</span>
+        <button id="logout-btn" class="ghost">Logout</button>
+      </div>
+    </header>
+
+    <nav id="nav" class="nav"></nav>
+
+    <main id="main-content" class="container"></main>
+
+    <!-- Login section -->
+    <section id="login-section" class="card login-card">
+      <h2 class="title">Login</h2>
+      <div class="input-group">
+        <label>Email</label>
+        <input id="login-email" type="email" />
+      </div>
+      <div class="input-group">
+        <label>Password</label>
+        <input id="login-password" type="password" />
+      </div>
+      <div id="login-error" class="text-error"></div>
+      <button id="login-btn" class="primary">Sign in</button>
+    </section>
+
+    <!-- App -->
+    <!-- <script type="module" src="./config.js"></script> -->
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
