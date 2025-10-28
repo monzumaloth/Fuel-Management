@@ -1,6 +1,6 @@
-// app.js (module)
+// app.js (enhanced with idle + tab-close auto logout)
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-import "./config.js"; // ensure window.APP_CONFIG exists
+import "./config.js";
 
 const cfg = window.APP_CONFIG || {};
 const SUPABASE_URL = cfg.SUPABASE_URL;
@@ -13,7 +13,6 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: { persistSession: true, storage: localStorage },
 });
 
-/* DOM elements (exported) */
 export const loginSection = document.getElementById("login-section");
 export const dashboardShell = document.getElementById("dashboard-shell");
 export const loginBtn = document.getElementById("login-btn");
@@ -25,11 +24,9 @@ export const mainContent = document.getElementById("main-content");
 export const backBtn = document.getElementById("back-btn");
 export const nav = document.getElementById("nav");
 
-/* live-bound exports */
 export let currentUser = null;
 export let profile = null;
 
-/* caches & maps */
 export let plazasCache = [];
 export let generatorsCache = [];
 export let profilesCache = [];
@@ -38,7 +35,6 @@ export let generatorsById = {};
 export let generatorsByPlaza = {};
 export let profilesByUserId = {};
 
-/* small helpers (exported) */
 export function el(tag, attrs = {}, children = []) {
   const e = document.createElement(tag);
   Object.entries(attrs).forEach(([k, v]) => {
@@ -71,7 +67,7 @@ export function toast(msg, type = "info") {
   setTimeout(() => t.remove(), 3000);
 }
 
-/* caches loader */
+/* ----------------------- CACHE HANDLING ----------------------- */
 export async function loadCaches() {
   try {
     const [plRes, gRes, pRes] = await Promise.all([
@@ -125,24 +121,7 @@ export function ensureCachesLoaded() {
   return Promise.resolve();
 }
 
-export function getGeneratorsForPlaza(plazaId) {
-  const key = plazaId || "";
-  return generatorsByPlaza[key] ? [...generatorsByPlaza[key]] : [];
-}
-
-export function buildGeneratorSelect(selectEl, plazaId, selectedId = null) {
-  selectEl.innerHTML = "";
-  const placeholder = el("option", { value: "" }, "Select generator");
-  selectEl.appendChild(placeholder);
-  const list = getGeneratorsForPlaza(plazaId);
-  list.forEach((g) => {
-    const opt = el("option", { value: g.id }, g.name);
-    if (selectedId && g.id === selectedId) opt.selected = true;
-    selectEl.appendChild(opt);
-  });
-}
-
-/* auth helpers */
+/* ----------------------- HELPERS ----------------------- */
 export async function fetchProfileForUserId(userId) {
   const { data, error } = await supabase
     .from("profiles")
@@ -153,7 +132,7 @@ export async function fetchProfileForUserId(userId) {
   return data;
 }
 
-/* exports for CSV/PDF/XLSX */
+/* ----------------------- EXPORTS ----------------------- */
 export function exportToCSV(filename, rows, headers) {
   const esc = (v) => {
     if (v === null || v === undefined) return "";
@@ -184,18 +163,12 @@ export function exportToPDF(title, rows, headers) {
   doc.setFontSize(8);
   let y = 20;
   const lineHeight = 7;
-
-  // header
   doc.setFont(undefined, "bold");
   headers.forEach((h, i) => doc.text(String(h), 10 + i * 35, y));
   doc.setFont(undefined, "normal");
   y += lineHeight;
-
   rows.forEach((r) => {
-    headers.forEach((h, i) => {
-      const text = String(r[h] ?? "");
-      doc.text(text, 10 + i * 35, y);
-    });
+    headers.forEach((h, i) => doc.text(String(r[h] ?? ""), 10 + i * 35, y));
     y += lineHeight;
     if (y > 280) {
       doc.addPage();
@@ -213,7 +186,7 @@ export function exportToExcel(filename, sheetName, rows, headers) {
   XLSX.writeFile(wb, filename);
 }
 
-/* navigation & view rendering */
+/* ----------------------- NAVIGATION ----------------------- */
 export function renderNavButtons() {
   nav.innerHTML = "";
   const addBtn = (v, l) =>
@@ -224,7 +197,6 @@ export function renderNavButtons() {
     addBtn("plazas", "Plazas");
     addBtn("generators", "Generators");
   }
-
   if (profile.role === "manager" || profile.role === "admin") {
     addBtn("users", "Users");
     addBtn("multiuserdetail", "User Detailed");
@@ -239,50 +211,42 @@ export function setBackNavigation(enable) {
   backBtn.onclick = enable ? () => renderView("home") : null;
 }
 
+/* ----------------------- VIEW RENDERING ----------------------- */
 export async function renderView(view) {
   setBackNavigation(false);
   try {
-    if (view === "home") {
-      const mod = await import("./views/shared.js");
-      await mod.renderHome();
-      return;
+    const modShared = await import("./views/shared.js");
+    const modAdmin = await import("./views/admin.js");
+
+    switch (view) {
+      case "home":
+        return modShared.renderHome();
+      case "transactions":
+        return modShared.renderTransactionsPage();
+      case "users":
+        if (profile.role !== "user") return modShared.renderUsersPage();
+        break;
+      case "multiuserdetail":
+        if (["manager", "admin"].includes(profile.role))
+          return modShared.renderMultiUserDetail();
+        break;
+      case "plazas":
+        if (profile.role === "admin") return modAdmin.renderPlazasManagement();
+        break;
+      case "generators":
+        if (profile.role === "admin")
+          return modAdmin.renderGeneratorsManagement();
+        break;
+      default:
+        return modShared.renderHome();
     }
-    if (view === "transactions") {
-      const mod = await import("./views/shared.js");
-      await mod.renderTransactionsPage();
-      return;
-    }
-    if (view === "users" && profile.role !== "user") {
-      const mod = await import("./views/shared.js");
-      await mod.renderUsersPage();
-      return;
-    }
-    if (
-      view === "multiuserdetail" &&
-      (profile.role === "manager" || profile.role === "admin")
-    ) {
-      const mod = await import("./views/shared.js");
-      await mod.renderMultiUserDetail();
-      return;
-    }
-    if (view === "plazas" && profile.role === "admin") {
-      const mod = await import("./views/admin.js");
-      await mod.renderPlazasManagement();
-      return;
-    }
-    if (view === "generators" && profile.role === "admin") {
-      const mod = await import("./views/admin.js");
-      await mod.renderGeneratorsManagement();
-      return;
-    }
-    const mod = await import("./views/shared.js");
-    await mod.renderHome();
   } catch (err) {
     console.error("renderView error", err);
     toast("Failed to render view", "error");
   }
 }
 
+/* ----------------------- AUTH LIFECYCLE ----------------------- */
 export function resetAppView() {
   if (dashboardShell) dashboardShell.classList.add("hidden");
   if (mainContent) mainContent.innerHTML = "";
@@ -290,18 +254,14 @@ export function resetAppView() {
     document.querySelector("header").style.display = "none";
   if (document.querySelector("nav"))
     document.querySelector("nav").style.display = "none";
-
   if (loginSection) {
     loginSection.classList.remove("hidden");
     loginSection.style.display = "block";
   }
-
   if (typeof appTitle !== "undefined") appTitle.textContent = "Fuel Dashboard";
   if (typeof userRoleBadge !== "undefined") userRoleBadge.textContent = "GUEST";
-
   currentUser = null;
   profile = null;
-
   console.log("✅ App reset — only login section visible");
 }
 
@@ -318,7 +278,6 @@ async function handleLogin() {
     email,
     password,
   });
-
   if (error) {
     loginError.textContent = error.message;
     return;
@@ -328,7 +287,7 @@ async function handleLogin() {
   await initAfterAuth();
 }
 
-async function handleLogout() {
+async function handleLogout(manual = true) {
   try {
     await supabase.auth.signOut();
   } catch (err) {
@@ -337,10 +296,12 @@ async function handleLogout() {
 
   currentUser = null;
   profile = null;
-
   resetAppView();
+
+  if (manual) toast("You have been logged out", "info");
 }
 
+/* ----------------------- SESSION RESTORE ----------------------- */
 async function restoreSessionOnLoad() {
   try {
     const { data } = await supabase.auth.getSession();
@@ -358,10 +319,10 @@ async function restoreSessionOnLoad() {
   }
 }
 
+/* ----------------------- INITIALIZATION ----------------------- */
 export async function initAfterAuth() {
   if (!currentUser) return;
 
-  // Fetch or create profile
   profile = await fetchProfileForUserId(currentUser.id);
   if (!profile) {
     const { error } = await supabase.from("profiles").insert({
@@ -373,30 +334,57 @@ export async function initAfterAuth() {
     profile = await fetchProfileForUserId(currentUser.id);
   }
 
-  // Load app data caches (plazas, generators, etc.)
   await loadCaches();
 
-  // Show dashboard and hide login section
   if (loginSection) loginSection.classList.add("hidden");
   if (dashboardShell) dashboardShell.classList.remove("hidden");
-
-  // Show header and nav again
   if (document.querySelector("header"))
     document.querySelector("header").style.display = "";
   if (document.querySelector("nav"))
     document.querySelector("nav").style.display = "";
 
-  // Update UI
   userRoleBadge.textContent = profile.role || "user";
   appTitle.textContent = `${(profile.role || "user").toUpperCase()} Dashboard`;
 
-  // Render dashboard for this user
   renderNavButtons();
   await renderView("home");
 
-  // ❌ DO NOT call resetAppView() here — that hides everything again!
+  // Start idle + tab close detection
+  setupAutoLogout();
 }
 
+/* ----------------------- AUTO LOGOUT LOGIC ----------------------- */
+let idleTimer = null;
+const IDLE_TIMEOUT_MS = 60 * 60 * 1000; // 1 hour
+
+function setupAutoLogout() {
+  resetIdleTimer();
+
+  const activityEvents = [
+    "mousemove",
+    "keydown",
+    "click",
+    "scroll",
+    "touchstart",
+  ];
+  activityEvents.forEach((event) =>
+    document.addEventListener(event, resetIdleTimer, false)
+  );
+
+  window.addEventListener("beforeunload", async () => {
+    await handleLogout(false);
+  });
+}
+
+function resetIdleTimer() {
+  if (idleTimer) clearTimeout(idleTimer);
+  idleTimer = setTimeout(() => {
+    toast("Session expired after 1 hour of inactivity", "warning");
+    handleLogout(false);
+  }, IDLE_TIMEOUT_MS);
+}
+
+/* ----------------------- STARTUP ----------------------- */
 loginBtn.addEventListener("click", handleLogin);
-logoutBtn.addEventListener("click", handleLogout);
+logoutBtn.addEventListener("click", () => handleLogout(true));
 restoreSessionOnLoad();
