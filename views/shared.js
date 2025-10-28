@@ -16,7 +16,6 @@ import {
   setBackNavigation,
 } from "../app.js";
 
-/* export helper used by user view or other modules */
 export async function fetchUserMetrics(user_id, plaza_id) {
   try {
     const { data: txs = [], error: txError } = await supabase
@@ -98,7 +97,6 @@ export async function fetchUserMetrics(user_id, plaza_id) {
   }
 }
 
-/* --------------- Home --------------- */
 export async function renderHome() {
   mainContent.innerHTML = "";
   setBackNavigation(false);
@@ -203,7 +201,6 @@ export async function renderHome() {
   });
 }
 
-/* ---------------- mini visuals ---------------- */
 function buildFuelGauge(net, added) {
   const percentage =
     added > 0 ? Math.max(0, Math.min(100, (net / added) * 100)) : 0;
@@ -283,7 +280,6 @@ function renderMiniPieChart(containerId, data) {
   });
 }
 
-/* ---------------- Transactions page with exports ---------------- */
 export async function renderTransactionsPage() {
   mainContent.innerHTML = "";
   setBackNavigation(true);
@@ -404,7 +400,6 @@ export async function renderTransactionsPage() {
   }
 }
 
-/* ---------------- Users list with export ---------------- */
 export async function renderUsersPage() {
   mainContent.innerHTML = "";
   setBackNavigation(true);
@@ -505,191 +500,10 @@ export async function renderUsersPage() {
   }
 }
 
-/* ---------------- User Detail (HPL) with export ---------------- */
-// export async function renderUserDetail(profileRow) {
-//   mainContent.innerHTML = "";
-//   setBackNavigation(true);
-//   const card = el("div", { class: "card" });
-//   card.append(
-//     el("h2", {}, `Details: ${profileRow.full_name || profileRow.email}`)
-//   );
-
-//   const { data: txs = [], error } = await supabase
-//     .from("fuel_transactions")
-//     .select("*")
-//     .eq("user_id", profileRow.user_id)
-//     .order("created_at", { ascending: false });
-//   if (error) {
-//     console.error("renderUserDetail txs error", error);
-//     card.append(
-//       el("p", { class: "error" }, "Failed to load transaction details.")
-//     );
-//     mainContent.append(card);
-//     return;
-//   }
-//   const totalAdded = (txs || [])
-//     .filter((t) => Number(t.fuel_amount) > 0)
-//     .reduce((s, t) => s + Number(t.fuel_amount || 0), 0);
-//   const totalUsed = Math.abs(
-//     (txs || [])
-//       .filter((t) => Number(t.fuel_amount) < 0)
-//       .reduce((s, t) => s + Number(t.fuel_amount || 0), 0)
-//   );
-//   const lastActivity = txs.length ? txs[0].transaction_date : null;
-//   card.append(el("p", {}, `Total added: ${fmt(totalAdded)} L`));
-//   card.append(el("p", {}, `Total used: ${fmt(totalUsed)} L`));
-//   card.append(
-//     el(
-//       "p",
-//       {},
-//       `Last activity: ${
-//         lastActivity ? new Date(lastActivity).toLocaleString() : "-"
-//       }`
-//     )
-//   );
-
-//   const toolsRow = el("div", { class: "row mt" });
-//   const pdfBtn = el("button", { class: "primary" }, "Export Detail PDF");
-//   const excelBtn = el("button", { class: "primary" }, "Export Detail Excel");
-//   const csvBtn = el("button", { class: "primary" }, "Export CSV");
-//   toolsRow.append(pdfBtn, excelBtn, csvBtn);
-//   card.append(toolsRow);
-
-//   const orderedTxs = (txs || []).slice().reverse();
-//   let prevOdo = null;
-//   const detailRows = [];
-
-//   orderedTxs.forEach((tx) => {
-//     const currentOdo =
-//       tx.odometer_hours !== null && tx.odometer_hours !== undefined
-//         ? Number(tx.odometer_hours)
-//         : null;
-
-//     let diff = null;
-//     let consumptionRate = null;
-
-//     if (prevOdo !== null && currentOdo !== null) diff = currentOdo - prevOdo;
-
-//     const fuelAmount = Number(tx.fuel_amount || 0);
-//     const litersAdded = fuelAmount > 0 ? fuelAmount : 0;
-//     const litersUsed = fuelAmount < 0 ? Math.abs(fuelAmount) : 0;
-
-//     const type = fuelAmount > 0 ? "Added to tank" : "Taken to generator";
-
-//     if (diff !== null && litersUsed !== null) {
-//       consumptionRate = Math.abs(diff) / Math.abs(litersUsed);
-//     }
-
-//     detailRows.push({
-//       tx,
-//       "Date It Was Used": tx.transaction_date
-//         ? new Date(tx.transaction_date).toLocaleString()
-//         : "",
-//       "Recording Dated": tx.created_at
-//         ? new Date(tx.created_at).toLocaleString()
-//         : "",
-//       Type: type,
-//       "Fuel Added (L)": litersAdded,
-//       "Fuel Used (L)": litersUsed,
-//       "Odometer(hrs)": currentOdo === null ? "" : currentOdo,
-//       "Diff since prev (hours)": diff === null ? "" : Math.abs(diff),
-//       HoursPerLiter:
-//         consumptionRate === null ? "" : Number(consumptionRate.toFixed(2)),
-//     });
-//     if (currentOdo !== null) prevOdo = currentOdo;
-//   });
-
-//   const hoursTable = el("table", { class: "table mt" });
-//   hoursTable.innerHTML = `<thead><tr>
-//     <th>Date It Was Used</th><th>Recording Dated</th><th>Type</th><th>Fuel Added (L)</th><th>Fuel Used (L)</th><th>Odometer(hrs)</th><th>Diff since prev (hours)</th><th>HoursPerLiter</th>
-//   </tr></thead><tbody></tbody>`;
-//   const tbody = hoursTable.querySelector("tbody");
-//   detailRows
-//     .slice()
-//     .reverse()
-//     .forEach((r) => {
-//       tbody.appendChild(
-//         el("tr", {}, [
-//           el("td", {}, r["Date It Was Used"]),
-//           el("td", {}, r["Recording Dated"]),
-//           el("td", {}, r["Type"]),
-//           el(
-//             "td",
-//             {},
-//             r["Fuel Added (L)"] === 0 ? "-" : fmt(r["Fuel Added (L)"])
-//           ),
-//           el(
-//             "td",
-//             {},
-//             r["Fuel Used (L)"] === 0 ? "-" : fmt(r["Fuel Used (L)"])
-//           ),
-//           el("td", {}, r["Odometer(hrs)"] === "" ? "-" : r["Odometer(hrs)"]),
-//           el(
-//             "td",
-//             {},
-//             r["Diff since prev (hours)"] === ""
-//               ? "-"
-//               : r["Diff since prev (hours)"]
-//           ),
-//           el(
-//             "td",
-//             {},
-//             r["HoursPerLiter"] === "" ? "-" : r["HoursPerLiter"]
-//           ),
-//         ])
-//       );
-//     });
-
-//   card.append(hoursTable);
-//   mainContent.append(card);
-
-//   if (profile.role === "user") {
-//     pdfBtn.style.display =
-//       excelBtn.style.display =
-//       csvBtn.style.display =
-//         "none";
-//   } else {
-//     const hdrs = [
-//       "Date It Was Used",
-//       "Recording Dated",
-//       "Type",
-//       "Fuel Added (L)",
-//       "Fuel Used (L)",
-//       "Odometer(hrs)",
-//       "Diff since prev (hours)",
-//       "HoursPerLiter",
-//     ];
-
-//     const exportRows = detailRows
-//       .slice()
-//       .reverse()
-//       .map((r) => ({
-//         "Date It Was Used": r["Date It Was Used"],
-//         "Recording Dated": r["Recording Dated"],
-//         Type: r["Type"],
-//         "Fuel Added (L)": r["Fuel Added (L)"],
-//         "Fuel Used (L)": r["Fuel Used (L)"],
-//         "Odometer(hrs)": r["Odometer(hrs)"],
-//         "Diff since prev (hours)": r["Diff since prev (hours)"],
-//         HoursPerLiter: r["HoursPerLiter"],
-//       }));
-//     pdfBtn.onclick = () =>
-//       exportToPDF(
-//         `Details - ${profileRow.full_name || profileRow.email}`,
-//         exportRows,
-//         hdrs
-//       );
-//     excelBtn.onclick = () =>
-//       exportToExcel(
-//         `details-${profileRow.full_name}.xlsx`,
-//         "Details",
-//         exportRows,
-//         hdrs
-//       );
-//     csvBtn.onclick = () =>
-//       exportToCSV(`details-${profileRow.full_name}.csv`, exportRows, hdrs);
-//   }
-// }
+/*******************************************************
+ * USER DETAIL + MULTI-USER DETAIL (Shared Generators)
+ * Complete, Ready-to-Use Version — 2025 Update
+ *******************************************************/
 
 export async function renderUserDetail(profileRow) {
   mainContent.innerHTML = "";
@@ -699,11 +513,20 @@ export async function renderUserDetail(profileRow) {
     el("h2", {}, `Details: ${profileRow.full_name || profileRow.email}`)
   );
 
+  // 🧩 Fetch all plaza transactions to track shared odometers
+  const { data: allPlazaTxs = [] } = await supabase
+    .from("fuel_transactions")
+    .select("*")
+    .eq("plaza_id", profileRow.plaza_id)
+    .order("transaction_date", { ascending: true });
+
+  // Fetch user’s own transactions
   const { data: txs = [], error } = await supabase
     .from("fuel_transactions")
     .select("*")
     .eq("user_id", profileRow.user_id)
     .order("created_at", { ascending: false });
+
   if (error) {
     console.error("renderUserDetail txs error", error);
     card.append(
@@ -712,15 +535,17 @@ export async function renderUserDetail(profileRow) {
     mainContent.append(card);
     return;
   }
-  const totalAdded = (txs || [])
-    .filter((t) => Number(t.fuel_amount) > 0)
-    .reduce((s, t) => s + Number(t.fuel_amount || 0), 0);
+
+  const totalAdded = txs
+    .filter((t) => t.fuel_amount > 0)
+    .reduce((s, t) => s + Number(t.fuel_amount), 0);
   const totalUsed = Math.abs(
-    (txs || [])
-      .filter((t) => Number(t.fuel_amount) < 0)
-      .reduce((s, t) => s + Number(t.fuel_amount || 0), 0)
+    txs
+      .filter((t) => t.fuel_amount < 0)
+      .reduce((s, t) => s + Number(t.fuel_amount), 0)
   );
   const lastActivity = txs.length ? txs[0].transaction_date : null;
+
   card.append(el("p", {}, `Total added: ${fmt(totalAdded)} L`));
   card.append(el("p", {}, `Total used: ${fmt(totalUsed)} L`));
   card.append(
@@ -733,6 +558,7 @@ export async function renderUserDetail(profileRow) {
     )
   );
 
+  // Tools
   const toolsRow = el("div", { class: "row mt" });
   const pdfBtn = el("button", { class: "primary" }, "Export Detail PDF");
   const excelBtn = el("button", { class: "primary" }, "Export Detail Excel");
@@ -740,379 +566,115 @@ export async function renderUserDetail(profileRow) {
   toolsRow.append(pdfBtn, excelBtn, csvBtn);
   card.append(toolsRow);
 
-  const orderedTxs = (txs || []).slice().reverse();
-  const prevOdoByGenerator = {}; // 👈 Track per generator
-  const detailRows = [];
+  // 🔹 Process transactions
+  const detailRows = processUserTransactions(txs, allPlazaTxs);
 
-  orderedTxs.forEach((tx) => {
-    const currentOdo =
-      tx.odometer_hours !== null && tx.odometer_hours !== undefined
-        ? Number(tx.odometer_hours)
-        : null;
-
-    const generatorId = tx.generator_id || "tank"; // tank additions can use a dummy key
-    let prevOdo = prevOdoByGenerator[generatorId] ?? null;
-    let diff = null;
-    let consumptionRate = null;
-
-    if (prevOdo !== null && currentOdo !== null) {
-      diff = currentOdo - prevOdo;
-    }
-
-    const fuelAmount = Number(tx.fuel_amount || 0);
-    const litersAdded = fuelAmount > 0 ? fuelAmount : 0;
-    const litersUsed = fuelAmount < 0 ? Math.abs(fuelAmount) : 0;
-    const type = fuelAmount > 0 ? "Added to tank" : "Taken to generator";
-
-    if (diff !== null && litersUsed > 0) {
-      consumptionRate = Math.abs(diff) / litersUsed;
-    }
-
-    const genLabel =
-      (tx.generator_id && generatorsById[tx.generator_id]?.name) || "-";
-
-    detailRows.push({
-      tx,
-      "Date It Was Used": tx.transaction_date
-        ? new Date(tx.transaction_date).toLocaleString()
-        : "",
-      "Recording Dated": tx.created_at
-        ? new Date(tx.created_at).toLocaleString()
-        : "",
-      Type: type,
-      Generator: genLabel,
-      "Fuel Added (L)": litersAdded,
-      "Fuel Used (L)": litersUsed,
-      "Odometer(hrs)": currentOdo === null ? "" : currentOdo,
-      "Diff since prev (hours)": diff === null ? "" : Math.abs(diff),
-      HoursPerLiter:
-        consumptionRate === null ? "" : Number(consumptionRate.toFixed(2)),
-    });
-
-    if (currentOdo !== null) {
-      prevOdoByGenerator[generatorId] = currentOdo; // 👈 update per generator
-    }
-  });
-
+  // Render table
   const hoursTable = el("table", { class: "table mt" });
   hoursTable.innerHTML = `<thead><tr>
-    <th>Refuel Date</th><th>Record Date</th><th>Type</th><th>Generator</th><th>Fuel Added (L)</th><th>Fuel Used (L)</th><th>Odometer(hrs)</th><th>Odo Diff</th><th>HPL</th>
-  </tr></thead><tbody></tbody>`;
+    <th>Refuel Date</th><th>Record Date</th><th>Type</th><th>Generator</th>
+    <th>Fuel Added (L)</th><th>Fuel Used (L)</th><th>Odometer(hrs)</th>
+    <th>Odo Diff</th><th>HPL</th></tr></thead><tbody></tbody>`;
   const tbody = hoursTable.querySelector("tbody");
-  detailRows
-    .slice()
-    .reverse()
-    .forEach((r) => {
-      tbody.appendChild(
-        el("tr", {}, [
-          el("td", {}, r["Date It Was Used"]),
-          el("td", {}, r["Recording Dated"]),
-          el("td", {}, r["Type"]),
-          el("td", {}, r["Generator"]),
-          el(
-            "td",
-            {},
-            r["Fuel Added (L)"] === 0 ? "-" : fmt(r["Fuel Added (L)"])
-          ),
-          el(
-            "td",
-            {},
-            r["Fuel Used (L)"] === 0 ? "-" : fmt(r["Fuel Used (L)"])
-          ),
-          el("td", {}, r["Odometer(hrs)"] === "" ? "-" : r["Odometer(hrs)"]),
-          el(
-            "td",
-            {},
-            r["Diff since prev (hours)"] === ""
-              ? "-"
-              : r["Diff since prev (hours)"]
-          ),
-          el("td", {}, r["HoursPerLiter"] === "" ? "-" : r["HoursPerLiter"]),
-        ])
-      );
-    });
 
+  detailRows.forEach((r) => {
+    tbody.appendChild(
+      el("tr", {}, [
+        el("td", {}, r["Refuel Date"]),
+        el("td", {}, r["Record Date"]),
+        el("td", {}, r["Type"]),
+        el("td", {}, r["Generator"]),
+        el(
+          "td",
+          {},
+          r["Fuel Added (L)"] === 0 ? "-" : fmt(r["Fuel Added (L)"])
+        ),
+        el("td", {}, r["Fuel Used (L)"] === 0 ? "-" : fmt(r["Fuel Used (L)"])),
+        el("td", {}, r["Odometer(hrs)"] || "-"),
+        el("td", {}, r["Diff since prev (hours)"] || "-"),
+        el("td", {}, r["HoursPerLiter"] || "-"),
+      ])
+    );
+  });
+  hoursTable.appendChild(tbody);
   card.append(hoursTable);
   mainContent.append(card);
 
-  if (profile.role === "user") {
-    pdfBtn.style.display =
-      excelBtn.style.display =
-      csvBtn.style.display =
-        "none";
-  } else {
-    const hdrs = [
-      "Refuel Date",
-      "Record Date",
-      "Type",
-      "Generator",
-      "Fuel Added (L)",
-      "Fuel Used (L)",
-      "Odo (hrs)",
-      "Odo Diff",
-      "HPL",
-    ];
+  // 🔹 Export buttons
+  const hdrs = [
+    "Refuel Date",
+    "Record Date",
+    "Type",
+    "Generator",
+    "Fuel Added (L)",
+    "Fuel Used (L)",
+    "Odometer(hrs)",
+    "Diff since prev (hours)",
+    "HoursPerLiter",
+  ];
 
-    const exportRows = detailRows
-      .slice()
-      .reverse()
-      .map((r) => ({
-        "Refuel Date": r["Refuel Date"],
-        "Record Date": r["Record Date"],
-        Type: r["Type"],
-        Generator: r["Generator"],
-        "Fuel Added (L)": r["Fuel Added (L)"],
-        "Fuel Used (L)": r["Fuel Used (L)"],
-        "Odometer(hrs)": r["Odometer(hrs)"],
-        "Odo Diff": r["Odo Diff"],
-        HoursPerLiter: r["HPL"],
-      }));
-    pdfBtn.onclick = () =>
-      exportToPDF(
-        `Details - ${profileRow.full_name || profileRow.email}`,
-        exportRows,
-        hdrs
-      );
-    excelBtn.onclick = () =>
-      exportToExcel(
-        `details-${profileRow.full_name}.xlsx`,
-        "Details",
-        exportRows,
-        hdrs
-      );
-    csvBtn.onclick = () =>
-      exportToCSV(`details-${profileRow.full_name}.csv`, exportRows, hdrs);
-  }
+  pdfBtn.onclick = () =>
+    exportToPDF(
+      `Details - ${profileRow.full_name || profileRow.email}`,
+      detailRows,
+      hdrs
+    );
+  excelBtn.onclick = () =>
+    exportToExcel(
+      `details-${profileRow.full_name}.xlsx`,
+      "Details",
+      detailRows,
+      hdrs
+    );
+  csvBtn.onclick = () =>
+    exportToCSV(`details-${profileRow.full_name}.csv`, detailRows, hdrs);
 }
 
-// export async function renderMultiUserDetail() {
-//   mainContent.innerHTML = "";
-//   setBackNavigation(true);
-
-//   const card = el("div", { class: "card" });
-//   card.append(el("h2", {}, "Multi-User Detailed Report (Users Only)"));
-
-//   let usersQuery = supabase
-//     .from("profiles")
-//     .select("user_id, full_name, email, plaza_id, role")
-//     .eq("role", "user")
-//     .order("email", { ascending: true });
-
-//   if (profile.role === "manager" && profile.plaza_id) {
-//     usersQuery = usersQuery.eq("plaza_id", profile.plaza_id);
-//   }
-//   if (profile.role === "manager" && !profile.plaza_id) {
-//     console.log("✅ Global manager detected — viewing all users");
-//   }
-//   if (profile.role === "admin") {
-//     console.log("✅ Admin detected — viewing all users");
-//   }
-
-//   const { data: users = [], error } = await usersQuery;
-//   if (error) {
-//     console.error("Error loading users:", error);
-//     card.append(el("p", { class: "error" }, "Failed to load users."));
-//     mainContent.append(card);
-//     return;
-//   }
-
-//   if (!users.length) {
-//     card.append(el("p", { class: "error" }, "No 'user' roles found."));
-//     mainContent.append(card);
-//     return;
-//   }
-
-//   const userCheckboxesContainer = el("div", { class: "user-checkboxes mt" });
-//   users.forEach((u) => {
-//     const plazaName =
-//       u.plaza_id && plazasById[u.plaza_id]
-//         ? plazasById[u.plaza_id].name
-//         : "No Plaza";
-
-//     const labelText = `${u.full_name || u.email} (${plazaName})`;
-//     const checkbox = el("input", {
-//       type: "checkbox",
-//       name: "user-select",
-//       value: u.user_id,
-//       id: `user-${u.user_id}`,
-//     });
-//     const label = el("label", { for: `user-${u.user_id}` }, [
-//       checkbox,
-//       ` ${labelText}`,
-//     ]);
-//     userCheckboxesContainer.append(
-//       el("div", { class: "checkbox-item" }, [label])
-//     );
-//   });
-
-//   const loadBtn = el(
-//     "button",
-//     { class: "primary mt" },
-//     "Load Selected Details"
-//   );
-//   card.append(
-//     el("label", {}, "Select users to view details:"),
-//     userCheckboxesContainer, // Append the container with checkboxes
-//     loadBtn
-//   );
-//   mainContent.append(card);
-
-//   const resultContainer = el("div", { class: "mt" });
-//   mainContent.append(resultContainer);
-
-//   loadBtn.onclick = async () => {
-//     const checkedBoxes = Array.from(
-//       userCheckboxesContainer.querySelectorAll('input[type="checkbox"]:checked')
-//     );
-//     const selected = checkedBoxes.map((o) => o.value);
-//     if (!selected.length) {
-//       toast("Please select at least one user", "error");
-//       return;
-//     }
-
-//     resultContainer.innerHTML = `<p>Loading details for ${selected.length} user(s)...</p>`;
-
-//     const { data: txs = [], error: txErr } = await supabase
-//       .from("fuel_transactions")
-//       .select("*")
-//       .in("user_id", selected)
-//       .order("created_at", { ascending: false });
-
-//     if (txErr) {
-//       console.error("Multi-user detail error", txErr);
-//       resultContainer.innerHTML = `<p class="error">Failed to load transactions.</p>`;
-//       return;
-//     }
-
-//     const txByUser = {};
-//     txs.forEach((tx) => {
-//       if (!txByUser[tx.user_id]) txByUser[tx.user_id] = [];
-//       txByUser[tx.user_id].push(tx);
-//     });
-
-//     resultContainer.innerHTML = "";
-//     for (const uid of selected) {
-//       const u = users.find((x) => x.user_id === uid);
-//       const userTxs = txByUser[uid] || [];
-//       const name = u?.full_name || u?.email || "Unknown User";
-
-//       const section = el("div", { class: "card mt" });
-//       section.append(el("h3", {}, `${name} — ${userTxs.length} transactions`));
-
-//       if (!userTxs.length) {
-//         section.append(el("p", {}, "No transactions found."));
-//         resultContainer.append(section);
-//         continue;
-//       } // ✅ Table setup
-
-//       const orderedTxs = userTxs.slice().reverse();
-//       const prevOdoByGen = {};
-//       const tbody = el("tbody");
-
-//       orderedTxs.forEach((tx) => {
-//         const genLabel =
-//           (tx.generator_id && generatorsById[tx.generator_id]?.name) || "-";
-//         const currentOdo =
-//           tx.odometer_hours !== null && tx.odometer_hours !== undefined
-//             ? Number(tx.odometer_hours)
-//             : null;
-//         const generatorId = tx.generator_id || "tank";
-//         const prevOdo = prevOdoByGen[generatorId] ?? null;
-//         const diff =
-//           prevOdo !== null && currentOdo !== null ? currentOdo - prevOdo : null;
-//         const fuelAmount = Number(tx.fuel_amount || 0);
-//         const litersUsed = fuelAmount < 0 ? Math.abs(fuelAmount) : 0;
-//         const rate =
-//           diff !== null && litersUsed > 0 ? Math.abs(diff) / litersUsed : null;
-//         if (currentOdo !== null) prevOdoByGen[generatorId] = currentOdo;
-
-//         tbody.appendChild(
-//           el("tr", {}, [
-//             el(
-//               "td",
-//               {},
-//               tx.transaction_date
-//                 ? new Date(tx.transaction_date).toLocaleString()
-//                 : "-"
-//             ),
-//             el("td", {}, genLabel),
-//             el(
-//               "td",
-//               {},
-//               fuelAmount > 0
-//                 ? fmt(fuelAmount) + " added"
-//                 : fmt(litersUsed) + " used"
-//             ),
-//             el("td", {}, currentOdo ?? "-"),
-//             el("td", {}, diff === null ? "-" : Math.abs(diff)),
-//             el(
-//               "td",
-//               {},
-//               rate === null ? "-" : Number(rate.toFixed(2)) + " HPL"
-//             ),
-//           ])
-//         );
-//       });
-
-//       const table = el("table", { class: "table mt" });
-//       table.innerHTML = `<thead><tr>
-//           <th>Date</th><th>Generator</th><th>Fuel</th><th>Odo</th><th>Diff</th><th>HPL</th>
-//         </tr></thead>`;
-//       table.appendChild(tbody);
-//       section.append(table);
-//       resultContainer.append(section);
-//     }
-//   };
-
-// }
-
-/**
- * Processes and formats a list of transactions for a single user, calculating
- * odometer differences and consumption rates (HPL).
- * NOTE: This helper function must be defined and accessible (e.g., exported from app.js).
- * @param {Array<Object>} userTxs - Array of fuel_transactions for one user.
- * @returns {Array<Object>} - Array of structured rows ready for display/export (newest first).
- */
-export function processUserTransactions(userTxs) {
-  if (!userTxs || userTxs.length === 0) return [];
-
-  // Order transactions by creation date (oldest first) to calculate the diff
+/*******************************************************
+ * Shared processing logic for both views
+ *******************************************************/
+export function processUserTransactions(userTxs, allPlazaTxs = []) {
+  if (!userTxs?.length) return [];
   const orderedTxs = userTxs
     .slice()
     .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
-  const prevOdoByGenerator = {};
-  const detailRows = [];
+  const prevOdoByGen = {};
+  const rows = [];
 
   orderedTxs.forEach((tx) => {
+    const genId = tx.generator_id || "tank";
     const currentOdo =
-      tx.odometer_hours !== null && tx.odometer_hours !== undefined
-        ? Number(tx.odometer_hours)
-        : null;
+      tx.odometer_hours != null ? Number(tx.odometer_hours) : null;
+    let prevOdo = prevOdoByGen[genId] ?? null;
 
-    const generatorId = tx.generator_id || "tank";
-    let prevOdo = prevOdoByGenerator[generatorId] ?? null;
-    let diff = null;
-    let consumptionRate = null;
-
-    if (prevOdo !== null && currentOdo !== null) {
-      diff = currentOdo - prevOdo;
+    // 🔹 If missing, look back globally (same generator across plaza)
+    if (prevOdo === null && currentOdo !== null && tx.generator_id) {
+      const prevTx = allPlazaTxs
+        .filter(
+          (t) =>
+            t.generator_id === tx.generator_id &&
+            new Date(t.transaction_date) < new Date(tx.transaction_date)
+        )
+        .sort(
+          (a, b) => new Date(b.transaction_date) - new Date(a.transaction_date)
+        )[0];
+      if (prevTx?.odometer_hours != null)
+        prevOdo = Number(prevTx.odometer_hours);
     }
 
-    const fuelAmount = Number(tx.fuel_amount || 0);
-    const litersAdded = fuelAmount > 0 ? fuelAmount : 0;
-    const litersUsed = fuelAmount < 0 ? Math.abs(fuelAmount) : 0;
-    const type = fuelAmount > 0 ? "Added to tank" : "Taken to generator";
+    const diff =
+      prevOdo != null && currentOdo != null ? currentOdo - prevOdo : null;
+    const fuel = Number(tx.fuel_amount || 0);
+    const litersAdded = fuel > 0 ? fuel : 0;
+    const litersUsed = fuel < 0 ? Math.abs(fuel) : 0;
 
-    // HPL calculation (Hours Diff / Liters Used)
-    if (diff !== null && litersUsed > 0) {
-      consumptionRate = Math.abs(diff) / litersUsed;
-    }
+    const type = fuel > 0 ? "Added to tank" : "Taken to generator";
+    const rate =
+      diff != null && litersUsed > 0 ? Math.abs(diff) / litersUsed : null;
+    const genLabel = generatorsById[tx.generator_id]?.name || "-";
+    const plazaLabel = plazasById[tx.plaza_id]?.name || "";
 
-    const genLabel =
-      (tx.generator_id && generatorsById[tx.generator_id]?.name) || "-";
-
-    // Store data in the exact format required by the exports
-    detailRows.push({
+    rows.push({
       "Refuel Date": tx.transaction_date
         ? new Date(tx.transaction_date).toLocaleString()
         : "",
@@ -1121,61 +683,53 @@ export function processUserTransactions(userTxs) {
         : "",
       Type: type,
       Generator: genLabel,
+      Plaza: plazaLabel,
       "Fuel Added (L)": litersAdded,
       "Fuel Used (L)": litersUsed,
-      "Odometer(hrs)": currentOdo === null ? "" : currentOdo,
-      "Diff since prev (hours)": diff === null ? "" : Math.abs(diff),
-      HoursPerLiter:
-        consumptionRate === null ? "" : Number(consumptionRate.toFixed(2)),
+      "Odometer(hrs)": currentOdo ?? "",
+      "Diff since prev (hours)": diff == null ? "" : Math.abs(diff),
+      HoursPerLiter: rate == null ? "" : Number(rate.toFixed(2)),
     });
 
-    if (currentOdo !== null) {
-      prevOdoByGenerator[generatorId] = currentOdo;
-    }
+    if (currentOdo != null) prevOdoByGen[genId] = currentOdo;
   });
 
-  // Return the rows in display order (newest first)
-  return detailRows.slice().reverse();
+  return rows.slice().reverse();
 }
 
+/*******************************************************
+ * Multi-User Detailed View (Shared Odo + Exports)
+ *******************************************************/
 export async function renderMultiUserDetail() {
   mainContent.innerHTML = "";
   setBackNavigation(true);
 
   const card = el("div", { class: "card" });
-  card.append(el("h2", {}, "Multi-User Detailed Report (Users Only)"));
+  card.append(el("h2", {}, "Multi-User Detailed Report (Shared Generators)"));
 
+  // Manager = same plaza, Admin/global = all
   let usersQuery = supabase
     .from("profiles")
     .select("user_id, full_name, email, plaza_id, role")
     .eq("role", "user")
     .order("email", { ascending: true });
 
-  if (profile.role === "manager" && profile.plaza_id) {
+  if (profile.role === "manager" && profile.plaza_id)
     usersQuery = usersQuery.eq("plaza_id", profile.plaza_id);
-  }
-  if (profile.role === "manager" && !profile.plaza_id) {
-    console.log("✅ Global manager detected — viewing all users");
-  }
-  if (profile.role === "admin") {
-    console.log("✅ Admin detected — viewing all users");
-  }
 
   const { data: users = [], error } = await usersQuery;
   if (error) {
-    console.error("Error loading users:", error);
-    card.append(el("p", { class: "error" }, "Failed to load users."));
-    mainContent.append(card);
+    console.error("User load failed:", error);
+    mainContent.append(el("p", { class: "error" }, "Failed to load users."));
     return;
   }
-
   if (!users.length) {
-    card.append(el("p", { class: "error" }, "No 'user' roles found."));
-    mainContent.append(card);
+    mainContent.append(el("p", { class: "error" }, "No users found."));
     return;
   }
 
-  const userCheckboxesContainer = el("div", { class: "user-checkboxes mt" });
+  // Selection
+  const userList = el("div", { class: "user-checkboxes mt" });
   users.forEach((u) => {
     const plazaName =
       u.plaza_id && plazasById[u.plaza_id]
@@ -1193,65 +747,59 @@ export async function renderMultiUserDetail() {
       checkbox,
       ` ${labelText}`,
     ]);
-    userCheckboxesContainer.append(
-      el("div", { class: "checkbox-item" }, [label])
-    );
+    userList.append(el("div", { class: "checkbox-item" }, [label]));
   });
-
   const loadBtn = el(
     "button",
     { class: "primary mt" },
     "Load Selected Details"
   );
-  card.append(
-    el("label", {}, "Select users to view details:"),
-    userCheckboxesContainer, // Append the container with checkboxes
-    loadBtn
-  );
+  card.append(el("label", {}, "Select users:"), userList, loadBtn);
   mainContent.append(card);
 
   const resultContainer = el("div", { class: "mt" });
   mainContent.append(resultContainer);
 
+  /************* LOAD & RENDER *************/
   loadBtn.onclick = async () => {
-    const checkedBoxes = Array.from(
-      userCheckboxesContainer.querySelectorAll('input[type="checkbox"]:checked')
+    const selected = Array.from(userList.querySelectorAll("input:checked")).map(
+      (x) => x.value
     );
-    const selected = checkedBoxes.map((o) => o.value);
     if (!selected.length) {
       toast("Please select at least one user", "error");
       return;
     }
+    resultContainer.innerHTML = `<p>Loading data...</p>`;
 
-    resultContainer.innerHTML = `<p>Loading details for ${selected.length} user(s)...</p>`;
-
-    const { data: txs = [], error: txErr } = await supabase
+    // Fetch all TXs for selected users
+    const { data: allTxs = [], error: txErr } = await supabase
       .from("fuel_transactions")
       .select("*")
       .in("user_id", selected)
-      .order("created_at", { ascending: false }); // Get newest first for grouping efficiency
+      .order("transaction_date", { ascending: true });
 
     if (txErr) {
-      console.error("Multi-user detail error", txErr);
+      console.error("Tx load fail:", txErr);
       resultContainer.innerHTML = `<p class="error">Failed to load transactions.</p>`;
       return;
     }
 
+    // Split by user
     const txByUser = {};
-    txs.forEach((tx) => {
-      if (!txByUser[tx.user_id]) txByUser[tx.user_id] = [];
-      txByUser[tx.user_id].push(tx);
+    allTxs.forEach((t) => {
+      if (!txByUser[t.user_id]) txByUser[t.user_id] = [];
+      txByUser[t.user_id].push(t);
     });
 
-    // 🔑 Report generation setup
+    resultContainer.innerHTML = "";
     const allExportRows = [];
-    // Include 'User' header for the combined report
-    const allHeaders = [
+    const headers = [
+      "User",
       "Refuel Date",
       "Record Date",
       "Type",
       "Generator",
-      "User",
+      "Plaza",
       "Fuel Added (L)",
       "Fuel Used (L)",
       "Odometer(hrs)",
@@ -1259,31 +807,22 @@ export async function renderMultiUserDetail() {
       "HoursPerLiter",
     ];
 
-    resultContainer.innerHTML = "";
-
     for (const uid of selected) {
       const u = users.find((x) => x.user_id === uid);
       const userTxs = txByUser[uid] || [];
-      const name = u?.full_name || u?.email || "Unknown User";
-
-      // 🔑 Call the helper function to process and calculate data
-      const detailRows = processUserTransactions(userTxs);
-
-      // Prepare rows for the combined export, adding the User column
-      const exportReadyRows = detailRows.map((r) => ({ ...r, User: name }));
-      allExportRows.push(...exportReadyRows);
+      const name = u?.full_name || u?.email || "Unknown";
 
       const section = el("div", { class: "card mt" });
       section.append(el("h3", {}, `${name} — ${userTxs.length} transactions`));
 
       if (!userTxs.length) {
-        section.append(el("p", {}, "No transactions found."));
+        section.append(el("p", {}, "No transactions."));
         resultContainer.append(section);
         continue;
       }
 
+      const detailRows = processUserTransactions(userTxs, allTxs);
       const tbody = el("tbody");
-
       detailRows.forEach((r) => {
         tbody.appendChild(
           el("tr", {}, [
@@ -1291,60 +830,50 @@ export async function renderMultiUserDetail() {
             el("td", {}, r["Record Date"]),
             el("td", {}, r["Type"]),
             el("td", {}, r["Generator"]),
-            el(
-              "td",
-              {},
-              r["Fuel Added (L)"] === 0 ? "-" : fmt(r["Fuel Added (L)"])
-            ),
-            el(
-              "td",
-              {},
-              r["Fuel Used (L)"] === 0 ? "-" : fmt(r["Fuel Used (L)"])
-            ),
-            el("td", {}, r["Odometer(hrs)"] === "" ? "-" : r["Odometer(hrs)"]),
-            el(
-              "td",
-              {},
-              r["Diff since prev (hours)"] === ""
-                ? "-"
-                : r["Diff since prev (hours)"]
-            ),
-            el("td", {}, r["HoursPerLiter"] === "" ? "-" : r["HoursPerLiter"]),
+            el("td", {}, r["Plaza"]),
+            el("td", {}, r["Fuel Added (L)"] || "-"),
+            el("td", {}, r["Fuel Used (L)"] || "-"),
+            el("td", {}, r["Odometer(hrs)"] || "-"),
+            el("td", {}, r["Diff since prev (hours)"] || "-"),
+            el("td", {}, r["HoursPerLiter"] || "-"),
           ])
         );
       });
 
       const table = el("table", { class: "table mt" });
       table.innerHTML = `<thead><tr>
-          <th>Refuel Date</th><th>Record Date</th><th>Type</th><th>Generator</th><th>Added (L)</th><th>Used (L)</th><th>Odo (hrs)</th><th>Odo Diff</th><th>HPL</th>
-        </tr></thead>`;
-      table.appendChild(tbody);
+        <th>Refuel Date</th><th>Record Date</th><th>Type</th><th>Generator</th><th>Plaza</th>
+        <th>Added (L)</th><th>Used (L)</th><th>Odo</th><th>Diff</th><th>HPL</th>
+      </tr></thead>`;
+      table.append(tbody);
       section.append(table);
       resultContainer.append(section);
-    } // End of user loop
 
-    // 🔑 ADD EXPORT BUTTONS for the combined report
-    if (allExportRows.length > 0) {
-      const exportToolsRow = el("div", { class: "row mt" });
+      // Push export data
+      detailRows.forEach((r) => allExportRows.push({ User: name, ...r }));
+    }
+
+    // Combined export tools
+    if (allExportRows.length) {
+      const tools = el("div", { class: "row mt" });
       const excelBtn = el(
         "button",
         { class: "primary" },
         "Export Combined Excel"
       );
       const csvBtn = el("button", { class: "primary" }, "Export Combined CSV");
-      exportToolsRow.append(excelBtn, csvBtn);
-      resultContainer.prepend(exportToolsRow);
+      tools.append(excelBtn, csvBtn);
+      resultContainer.prepend(tools);
 
-      // 🔑 EXPORT HANDLERS
       excelBtn.onclick = () =>
         exportToExcel(
-          `multi-user-report.xlsx`,
-          "Combined Details",
+          "multi-user-report.xlsx",
+          "Combined",
           allExportRows,
-          allHeaders
+          headers
         );
       csvBtn.onclick = () =>
-        exportToCSV(`multi-user-report.csv`, allExportRows, allHeaders);
+        exportToCSV("multi-user-report.csv", allExportRows, headers);
     }
-  }; // End of loadBtn.onclick
+  };
 }
