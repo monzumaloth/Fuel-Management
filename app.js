@@ -121,6 +121,23 @@ export function ensureCachesLoaded() {
   return Promise.resolve();
 }
 
+export function getGeneratorsForPlaza(plazaId) {
+  const key = plazaId || "";
+  return generatorsByPlaza[key] ? [...generatorsByPlaza[key]] : [];
+}
+
+export function buildGeneratorSelect(selectEl, plazaId, selectedId = null) {
+  selectEl.innerHTML = "";
+  const placeholder = el("option", { value: "" }, "Select generator");
+  selectEl.appendChild(placeholder);
+  const list = getGeneratorsForPlaza(plazaId);
+  list.forEach((g) => {
+    const opt = el("option", { value: g.id }, g.name);
+    if (selectedId && g.id === selectedId) opt.selected = true;
+    selectEl.appendChild(opt);
+  });
+}
+
 /* ----------------------- HELPERS ----------------------- */
 export async function fetchProfileForUserId(userId) {
   const { data, error } = await supabase
@@ -388,3 +405,4 @@ function resetIdleTimer() {
 loginBtn.addEventListener("click", handleLogin);
 logoutBtn.addEventListener("click", () => handleLogout(true));
 restoreSessionOnLoad();
+
