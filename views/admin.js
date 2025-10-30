@@ -6,13 +6,16 @@ import {
   ensureCachesLoaded,
   plazasById,
   setBackNavigation,
+  mainContent, // ✅ import added
 } from "../app.js";
 
 export async function renderPlazasManagement() {
   setBackNavigation(true);
+  mainContent.innerHTML = ""; // ✅ Clear previous content
+
   const container = el("div", { class: "card" });
   container.append(el("h2", {}, "Plazas"));
-  mainContent?.append(container); // mainContent is in app, but admin may not need it here
+  mainContent.append(container);
 
   const input = el("input", { placeholder: "New plaza name" });
   const btn = el("button", { class: "primary" }, "Add Plaza");
@@ -34,6 +37,7 @@ export async function renderPlazasManagement() {
     .from("plazas")
     .select("*")
     .order("name", { ascending: true });
+
   if (error) {
     console.error("load plazas error", error);
     toast("Failed to load plazas", "error");
@@ -42,6 +46,7 @@ export async function renderPlazasManagement() {
 
   const table = el("table", { class: "table mt" });
   table.innerHTML = `<thead><tr><th>Name</th><th>Actions</th></tr></thead><tbody></tbody>`;
+
   plazas.forEach((p) => {
     const tr = el("tr", {}, [
       el("td", {}, p.name),
@@ -78,9 +83,11 @@ export async function renderPlazasManagement() {
 
 export async function renderGeneratorsManagement() {
   setBackNavigation(true);
+  mainContent.innerHTML = ""; // ✅ Clear previous content
+
   const container = el("div", { class: "card" });
   container.append(el("h2", {}, "Generators"));
-  mainContent?.append(container);
+  mainContent.append(container);
 
   await ensureCachesLoaded();
   const plazaSelect = el("select");
@@ -115,6 +122,7 @@ export async function renderGeneratorsManagement() {
     .from("generators")
     .select("*")
     .order("created_at", { ascending: false });
+
   if (error) {
     console.error("load generators error", error);
     toast("Failed to load generators", "error");
@@ -123,6 +131,7 @@ export async function renderGeneratorsManagement() {
 
   const table = el("table", { class: "table mt" });
   table.innerHTML = `<thead><tr><th>Name</th><th>Plaza</th><th>Actions</th></tr></thead><tbody></tbody>`;
+
   gens.forEach((g) => {
     const tr = el("tr", {}, [
       el("td", {}, g.name),
