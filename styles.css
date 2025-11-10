@@ -223,11 +223,6 @@ button.destructive {
   max-height: 100px;
 }
 
-/*MultiUser*/
-/* ==========================================================================
-   MULTI-USER REPORT STYLING
-   ========================================================================== */
-
 /* Container for all individual user checkbox items */
 .user-checkboxes {
   /* Create a grid layout for better spacing and visual organization */
@@ -311,6 +306,529 @@ button.destructive {
 .result-container .table {
   width: 100%;
   table-layout: auto; /* Ensures columns size based on content */
+}
+
+/* General Report Container Styling */
+.report-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.report-title {
+  color: #1f2937; /* Dark text for headings */
+  font-size: 1.8rem;
+  font-weight: 700;
+  border-color: #e5e7eb !important;
+}
+
+/* Export Buttons Styling */
+.tools-row {
+  padding: 10px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.export-btn {
+  /* General button styling adjustments */
+  font-size: 0.9rem;
+  padding: 8px 15px;
+  border-radius: 6px;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.btn-pdf {
+  background-color: #ef4444; /* Red for PDF */
+  border-color: #ef4444;
+  color: white;
+}
+.btn-pdf:hover {
+  background-color: #dc2626;
+  border-color: #dc2626;
+}
+
+.btn-excel {
+  background-color: #10b981; /* Green for Excel */
+  border-color: #10b981;
+  color: white;
+}
+.btn-excel:hover {
+  background-color: #059669;
+  border-color: #059669;
+}
+
+.btn-csv {
+  background-color: #3b82f6; /* Blue for CSV */
+  border-color: #3b82f6;
+  color: white;
+}
+.btn-csv:hover {
+  background-color: #2563eb;
+  border-color: #2563eb;
+}
+
+/* Table Styling */
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.report-table thead.thead-dark th {
+  background-color: #374151; /* Dark header background */
+  color: white;
+  font-weight: 600;
+  border-bottom: 2px solid #1f2937;
+  padding: 12px 15px;
+  text-align: left;
+}
+
+.report-table tbody tr {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.report-table tbody tr:nth-of-type(even) {
+  background-color: #f9fafb; /* Light stripe effect */
+}
+
+.report-table tbody tr:hover {
+  background-color: #f3f4f6; /* Hover effect */
+  cursor: default;
+}
+
+.report-table td {
+  padding: 12px 15px;
+  vertical-align: middle;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.td-amount {
+  font-weight: 600;
+  color: #059669; /* Highlight amount field */
+}
+
+/* Reusing General Report and Export Styles from previous function */
+
+/* Report Container Styling */
+.report-card {
+  /* ... (Same as before) */
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.report-title {
+  /* ... (Same as before) */
+  color: #1f2937;
+  font-size: 1.8rem;
+  font-weight: 700;
+  border-color: #e5e7eb !important;
+}
+
+/* Export Buttons Styling */
+.tools-row {
+  /* ... (Same as before) */
+  padding: 10px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+/* Table Styling */
+.report-table {
+  /* ... (Same as before) */
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.report-table thead.thead-dark th {
+  /* ... (Same as before) */
+  background-color: #374151;
+  color: white;
+  font-weight: 600;
+}
+
+/* Custom Styles for User Table */
+
+.td-role {
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+/* Role-specific color indicators for quick identification */
+.role-admin {
+  color: #ef4444; /* Red for Admin */
+}
+
+.role-manager {
+  color: #f59e0b; /* Yellow/Orange for Manager */
+}
+
+.role-user {
+  color: #10b981; /* Green for standard User */
+}
+
+/* Action Button Style */
+.action-btn {
+  /* Clear, low-priority button */
+  background: none;
+  border: 1px solid #d1d5db;
+  color: #4b5563;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.action-btn:hover {
+  background-color: #e5e7eb;
+}
+
+/* Override original 'ghost' class if necessary */
+.ghost {
+  /* Ensure the default 'ghost' style is overridden by 'action-btn' */
+  border: none;
+  background: none;
+}
+
+/* Summary Block Styles */
+.summary-block {
+  background-color: #f9fafb; /* Very light gray background */
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 30px;
+}
+
+.summary-item {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: #374151;
+}
+
+.summary-item strong {
+  font-weight: 700;
+  color: #111827;
+  margin-left: 5px;
+}
+
+/* Table Cell Colors for Visual Differentiation */
+
+/* Style for Added Fuel (Positive transactions) */
+.td-added {
+  color: #059669; /* Green */
+  font-weight: 600;
+}
+
+/* Style for Used Fuel (Negative transactions) */
+.td-used {
+  color: #ef4444; /* Red */
+  font-weight: 600;
+}
+
+/* Highlight the Hours Per Liter (HPL) efficiency metric */
+.td-hpl {
+  font-weight: 600;
+  color: #3b82f6; /* Blue/Primary color */
+}
+
+/* Row shading based on transaction type for quick scanning */
+.fuel-use-row {
+  /* Subtle background for usage rows */
+  background-color: #fee2e2 !important;
+}
+.fuel-add-row {
+  /* Subtle background for refueling rows */
+  background-color: #d1fae5 !important;
+}
+.fuel-use-row:hover,
+.fuel-add-row:hover {
+  /* Maintain hover effect visibility */
+  filter: brightness(0.95);
+}
+
+/* User Selection Grid */
+.checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(280px, 1fr)
+  ); /* Responsive grid */
+  gap: 15px;
+  padding: 10px 0;
+  border-top: 1px solid #f3f4f6;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.checkbox-item {
+  padding: 5px 0;
+}
+
+.user-label {
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+}
+
+.user-label input.form-check-input {
+  margin-right: 10px;
+  /* Custom checkbox styling can be added here */
+}
+
+.btn-load-report {
+  /* Button consistency with previous export buttons */
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+  color: white;
+  font-size: 1rem;
+  padding: 10px 20px;
+  border-radius: 6px;
+  width: 100%; /* Full width button in the selection block */
+  transition: background-color 0.2s;
+}
+
+.btn-load-report:hover {
+  background-color: #2563eb;
+  border-color: #2563eb;
+}
+
+/* Report Sections (Individual User Reports) */
+.report-section {
+  border-radius: 10px;
+}
+
+.section-header {
+  color: #1f2937;
+  font-size: 1.5rem;
+  font-weight: 600;
+  border-color: #d1d5db !important;
+}
+
+/* Combined Export Tools */
+.report-summary-tools {
+  border-color: #d1d5db !important;
+}
+
+/* Loading Message */
+.loading-message {
+  color: #6b7280;
+  font-style: italic;
+}
+
+/* Container for each Plaza's metrics */
+.plaza-metric-card {
+  border-left: 5px solid #3b82f6; /* Highlight border */
+  border-radius: 8px;
+  padding: 20px;
+  background-color: #ffffff;
+  transition: box-shadow 0.3s;
+}
+.plaza-metric-card:hover {
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+.plaza-header {
+  font-size: 1.5rem;
+  font-weight: 600;
+  border-color: #e5e7eb !important;
+}
+
+/* Status Indicator */
+.status-indicator {
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  margin: 10px;
+  border: 2px solid; /* Uses dynamic color from JS */
+  border-radius: 20px;
+  text-transform: uppercase;
+}
+
+/* Dashboard Grid for Metrics */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr; /* Three balanced columns */
+  gap: 20px;
+  align-items: center;
+}
+
+/* Metric Summary Block */
+.metric-summary {
+  padding-left: 20px;
+  border-left: 1px solid #e5e7eb;
+}
+
+.metric-item {
+  font-size: 1.05rem;
+  margin-bottom: 8px;
+}
+.metric-item strong {
+  font-weight: 700;
+}
+
+.metric-item.added strong {
+  color: #10b981; /* Green */
+}
+.metric-item.used strong {
+  color: #ef4444; /* Red */
+}
+.metric-item.net strong {
+  color: #3b82f6; /* Blue */
+  font-size: 1.15rem; /* Slightly larger emphasis */
+}
+
+/* Net Balance Label under Gauge */
+.metric-net {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0;
+}
+
+/* Pie Chart Area */
+.usage-chart-area {
+  padding: 0 10px;
+}
+.chart-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #6b7280;
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+/* --- Form General Styles --- */
+.fuel-form-wrapper {
+  padding: 20px 0;
+  margin-bottom: 20px;
+}
+
+.form-section-header {
+  border-bottom: 2px solid #f3f4f6;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+.form-label {
+  font-weight: 500;
+  color: #4b5563;
+  margin-bottom: 5px;
+  font-size: 0.95rem;
+}
+
+.form-input,
+.form-textarea {
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 1rem;
+  color: #1f2937;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  outline: none;
+}
+
+/* --- Form Buttons --- */
+.btn-add-fuel {
+  background-color: #10b981; /* Green for Addition */
+  border-color: #10b981;
+}
+.btn-add-fuel:hover {
+  background-color: #059669;
+}
+
+.btn-use-fuel {
+  /* Uses .destructive class, ensure its color is red/orange */
+  background-color: #ef4444;
+  border-color: #ef4444;
+}
+.btn-use-fuel:hover {
+  background-color: #dc2626;
+}
+
+/* --- User Dashboard Metrics Grid --- */
+
+.user-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  padding: 20px 0;
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.metric-box {
+  padding: 15px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background-color: #f9fafb;
+  text-align: center;
+}
+
+.metric-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.metric-label {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+
+/* Color Coding for Metric Boxes */
+.box-balance .metric-value {
+  color: #3b82f6;
+}
+.box-usage .metric-value {
+  color: #f59e0b;
+}
+.box-added .metric-value {
+  color: #10b981;
+}
+.box-used .metric-value {
+  color: #ef4444;
+}
+/* Responsive adjustment for smaller screens */
+@media (max-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr; /* Stack columns vertically on mobile */
+    text-align: center;
+  }
+  .metric-summary {
+    border-left: none;
+    border-top: 1px solid #e5e7eb;
+    padding-left: 0;
+    padding-top: 20px;
+  }
+  .gauge-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 }
 
 /* responsive */
